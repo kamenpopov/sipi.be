@@ -8,15 +8,20 @@
 	--background-color: black;
 }
 
+h1, h2, h3, h4, h5, h6, p {
+	color: var(--font-color);
+	transition: color 1s;
+}
+
 [data-theme="dark"] #sun {
 	display: none;
 }
 
-:not([data-theme="dark"]) #moon {
+:not([data-theme="dark"]) #earth {
 	display: none;
 }
 
-[data-theme="dark"] #moon {
+[data-theme="dark"] #earth {
 	display: block;
 }
 
@@ -41,14 +46,7 @@ header {
 }
 
 img {
-    /* pointer-events: none; */
 	user-select: none;
-}
-
-p {
-	color: var(--font-color);
-
-	transition: color 1s;
 }
 
 #logo {
@@ -71,17 +69,64 @@ p {
 	overflow: hidden;
 }
 
+#posts {
+	/* max-width: 70%; */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+@media (min-width: 650px) {
+	#posts {
+		width: 50%;
+	}
+}
+
+#newest-post {
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(4, 25%);
+	grid-template-rows: repeat(4, 25%);
+	aspect-ratio: 1 / 1;
+}
+
+.merged-cell {
+	display: flex;
+	align-items: center;
+}
+
+#newest-post > img, .merged-cell > img {
+	width: 100%;
+}
+
+#newest-post > .post {
+	grid-area: 2 / 2 / 4 / 4;
+}
+
+.post {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.post-link {
+	font-size: large;
+}
+
 #flying_shit {
 	overflow: hidden;
 	position: absolute;
 	top: 20%;
-	left: -200px;
+	left: 0px;
 	animation: bird_horiz 9s linear infinite, bird_vert 1s ease-in-out infinite;
 }
 
 @keyframes bird_horiz {
-	from { left: 0; }
-  	to   { left: calc(100vw + 200px); }
+	from { left: 0px; }
+  	to   { left: calc(100dvw - 50px); }
 }
 
 @keyframes bird_vert {
@@ -98,40 +143,18 @@ p {
 	}
 }
 
-/*
-@keyframes bird_vert {
-	0% {
-		transform: translateY(-40%);
-	}
-
-	10% {
-		transform: translateY(-60%);
-	}
-
-	20% {
-		transform: translateY(-40%);
-	}
-
-	30% {
-		transform: translateY(-60%);
-	}
-
-	40% {
-		transform: translateY(-40%);
-	}
-
-	50% {
-		transform: translateY(-60%);
-	}
-} */
-
 footer {
 	height: 100px;
 	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-image: url('./footer.png');
+	background-image: url('./img/footer.png');
 	background-size: contain;
 	background-repeat: repeat-x;
+	transition: background-image 1s;
+}
+
+[data-theme="dark"] footer {
+	background-image: url('./img/footer_moon.png');
 }

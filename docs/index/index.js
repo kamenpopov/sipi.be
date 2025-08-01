@@ -2,15 +2,14 @@ let theme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', theme);
 
 const sun = document.getElementById('sun');
-const moon = document.getElementById('moon');
+const earth = document.getElementById('earth');
 const flyingShit = document.getElementById('flying_shit');
-
 
 function changeDecoration() {
 	if(theme == 'dark') {
-		flyingShit.src = 'index/saturn.gif';
+		flyingShit.src = 'index/img/saturn.gif';
 	} else {
-		flyingShit.src = 'index/bird-gif.gif';
+		flyingShit.src = 'index/img/bird-gif.gif';
 	}
 }
 changeDecoration();
@@ -24,5 +23,5 @@ function switchTheme() {
 
 sun.addEventListener('click', switchTheme);
 
-moon.addEventListener('click', switchTheme);
+earth.addEventListener('click', switchTheme);
 
