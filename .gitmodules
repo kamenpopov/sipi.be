@@ -1,0 +1,3 @@
+[submodule "docs/petak"]
+	path = docs/petak
+	url = https://github.com/kamenpopov/petak.git
