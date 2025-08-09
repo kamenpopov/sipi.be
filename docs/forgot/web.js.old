@@ -1,0 +1,195 @@
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+const userCount = document.getElementById("user-count");
+const counterText = document.getElementById('info-text')
+const loadingText = document.getElementById('loading');
+
+const ws = new WebSocket('wss://tracker.openwebtorrent.com');
+
+const infoHash = String.fromCharCode(171, 160, 171, 109, 92, 85, 83, 92, 142, 41, 31, 171, 217, 38, 70, 21, 190, 22, 249, 55);
+
+const randomId = () => {
+	const id = [];
+	for (let i = 0; i < 6; i += 1) id.push(Math.floor(26 * Math.random()) + 65);
+	return String.fromCharCode(...id);
+} // this or first message as id?
+
+const peerId = randomId();
+console.log('id: ', peerId);
+
+const offeredConns = {};
+const activeConns = {};
+let channels = {};
+
+let messageHist = [];
+let requestedHistory = false;
+
+function addMessage(peerId, msg) {
+	if(messageHist.length == 100) {
+		messageHist.shift();
+	}
+
+	messageHist.push([peerId, msg]);
+	const msgel = document.createElement('p');
+    msgel.innerHTML = `<b>${peerId}: </b> ${msg}`; // trust based society
+    messages.appendChild(msgel);
+}
+
+function updateCounter() {
+	const count = Object.keys(activeConns).length;
+	counterText.innerHTML = `В дискусията има <b>${count}</b> ${count == 1 ? 'друг' : 'други'}. Ти си ${peerId}`;
+}
+
+input.addEventListener('keypress', (e) => {
+	if(e.key == 'Enter') {				
+		Object.values(channels).forEach(c => c.send(e.target.value));
+		e.target.value = "";
+	}
+});
+
+const createConnection = async (offer=null) => {
+	const conn = new RTCPeerConnection({
+		iceServers: [
+			{ urls: 'stun:stun.stunprotocol.org' },
+			{ urls: 'stun:stun1.l.google.com:19302' },
+		],
+	});
+
+	const channel = conn.createDataChannel('data', {
+		ordered: true,
+		negotiated: true,
+		id: 1,
+	});
+
+	if (offer) {
+		await conn.setRemoteDescription(offer);
+		const desc = await conn.createAnswer();
+		await conn.setLocalDescription(desc);
+	} else {
+		const desc = await conn.createOffer();
+		await conn.setLocalDescription(desc);
+	}
+
+	channel.onmessage = (msg) => {
+		// msg = JSON.parse(msg);
+		// console.log(JSON.stringify(msg), typeof msg.data);
+		
+
+		// console.log(msg.data);
+		
+		// console.log(JSON.stringify(msg));
+
+		if(typeof msg.data == 'string') {
+			addMessage(peerId, msg.data);
+			return;
+		}
+		
+		if (typeof msg.data == 'object') {
+			console.log(msg.data);
+			
+			switch (msg.data.purpose) {
+				case 'req_hist':
+					channel.send({ purpose: 'hist', entries: messageHistory });
+					break;
+				case 'hist':
+					for(const [peer, msg] of msg.data.entries) {
+						addMessage(peer, msg);
+					}
+			}
+		}
+	}
+
+	channel.onopen = () => {
+		channels[peerId] = channel;
+		if(!requestedHistory){
+			console.log('history not req');
+			
+			channel.send({ purpose: 'req_hist' });
+			requestedHistory = true;
+		}
+	}
+
+	await new Promise((res, rej) => window.setTimeout(res, 1));
+
+	return conn;
+};
+
+ws.onopen = async () => {
+	loadingText.innerText = 'Чакаме люде....'
+
+	const conn = await createConnection();
+	const offerId = randomId();
+
+	ws.send(JSON.stringify({
+		action: 'announce',
+		info_hash: infoHash,
+		peer_id: peerId,
+		numwant: 50,
+		event: 'started',
+		offers: [
+			{ offer_id: offerId, offer: conn.localDescription },
+		],
+	}));
+
+	offeredConns[offerId] = conn;
+}
+
+ws.onmessage = async (msg) => {
+	const data = JSON.parse(msg.data);
+
+	if (data.info_hash != infoHash) return console.warn('bad info hash');
+
+	// console.log('tracker:', data);
+
+	console.log([Object.keys(activeConns)].join(', '));
+
+	handle: if (data.action == 'announce' && data.peer_id && data.peer_id != peerId) {
+		if(Object.keys(activeConns).includes(data.peer_id)) return;
+
+		if (data.offer) {
+			const conn = await createConnection(data.offer);
+			ws.send(JSON.stringify({
+				action: 'announce',
+				info_hash: infoHash,
+				peer_id: peerId,
+				to_peer_id: data.peer_id,
+				offer_id: data.offer_id,
+				answer: conn.localDescription,
+			}));
+			activeConns[data.peer_id] = conn;
+			updateCounter();
+		}
+
+		if (data.answer) {
+			if (!offeredConns[data.offer_id]) break handle;
+			const conn = offeredConns[data.offer_id];
+			delete offeredConns[data.offer_id];
+
+			conn.setRemoteDescription(data.answer);
+			activeConns[data.peer_id] = conn;
+			updateCounter();
+		}
+	}
+}
+
+setInterval(async () => {
+	const conn = await createConnection();
+	const offerId = randomId();
+
+	ws.send(JSON.stringify({
+		action: 'announce',
+		info_hash: infoHash,
+		peer_id: peerId,
+		// numwant: 3, // request to connect to 3 peers
+		// event: 'update',
+		offers: [
+			{ offer_id: offerId, offer: conn.localDescription },
+		],
+	}));
+
+	offeredConns[offerId] = conn;
+}, 3000); // every 5 seconds
+
+ws.onclose = () => {
+	console.log('closed');
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Забравиг</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        body {
+            height: 100dvh;
+            width: 100dvw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            flex-shrink: 0;
+        }
+
+        #messages {
+            flex-grow: 1;
+            overflow-y: scroll;
+        }
+
+        #messages::-webkit-scrollbar {
+           width: 12px;
+        }
+
+        #messages::-webkit-scrollbar-track {
+            background: #f5f5f5;
+        }
+
+        #messages::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 6px;
+            border: 3px solid #f5f5f5;
+        }
+
+        footer {
+            flex-shrink: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #input {
+            box-sizing: border-box;
+            width: 100%;
+            font-size: large;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Забравиг - всичко се изтрива, когато стаята се изпразни.</h1>
+        <p id="loading">Свързване с тракер...</p>
+        <p id="info-text" class="hidden">В дискусията има <b id="user-count">0</b> други.</p>
+    </header>
+    
+    <div id="messages"></div>    
+
+    <footer>
+        <input type="text" id="input">
+    </footer>
+     <script src="index.js"></script>
+</body>
+</html>
