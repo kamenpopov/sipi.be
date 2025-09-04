@@ -94,6 +94,7 @@ const createConnection = async (offer = null, remotePeerId = null) => {
 			{ urls: 'stun:stun.stunprotocol.org' },
 			{ urls: 'stun:stun1.l.google.com:19302' },
 			{
+				// stupid ass github pages not working
 				urls: 'turn:relay1.expressturn.com:3480',
 				username: 'efPU52K4SLOQ34W2QY',
 				credential: '1TJPNFxHKXrZfelz'
