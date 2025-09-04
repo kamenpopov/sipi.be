@@ -94,7 +94,7 @@ const createConnection = async (offer = null, remotePeerId = null) => {
 			{ urls: 'stun:stun.stunprotocol.org' },
 			{ urls: 'stun:stun1.l.google.com:19302' },
 			{
-				urls: 'relay1.expressturn.com:3480',
+				urls: 'turn:relay1.expressturn.com:3480',
 				username: 'efPU52K4SLOQ34W2QY',
 				credential: '1TJPNFxHKXrZfelz'
 			}
