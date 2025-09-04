@@ -91,8 +91,8 @@ input.addEventListener('keypress', (e) => {
 const createConnection = async (offer = null, remotePeerId = null) => {
 	const conn = new RTCPeerConnection({
 		iceServers: [
-			{ urls: 'stun:stun.stunprotocol.org' },
-			{ urls: 'stun:stun1.l.google.com:19302' },
+			// { urls: 'stun:stun.stunprotocol.org' },
+			// { urls: 'stun:stun1.l.google.com:19302' },
 			{
 				urls: 'turn:relay1.expressturn.com:3480?transport=tcp',
 				username: '000000002072346098',
