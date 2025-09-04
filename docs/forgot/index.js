@@ -61,7 +61,7 @@ function updateCounter() {
     if (!sessionStartTime) return;
 
 	let msg = `В дискусията има <b>${count}</b> ${count === 1 ? 'друг' : 'други'}. Ти си <b>${peerId}</b>`;
-    
+
     if (sessionStartTime) {
 		const elapsed = formatElapsed(Date.now() - sessionStartTime);
 		msg += `<br/>Плямпа се от <b>${elapsed}</b>.`;
@@ -93,6 +93,11 @@ const createConnection = async (offer = null, remotePeerId = null) => {
 		iceServers: [
 			{ urls: 'stun:stun.stunprotocol.org' },
 			{ urls: 'stun:stun1.l.google.com:19302' },
+			{
+				urls: 'relay1.expressturn.com:3480',
+				username: 'efPU52K4SLOQ34W2QY',
+				credential: '1TJPNFxHKXrZfelz'
+			}
 		],
 	});
 
