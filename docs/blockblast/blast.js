@@ -1,3 +1,5 @@
+// comment to rerun workflow
+
 const $ = (sel, el=document) => el.querySelector(sel);
 
 const gameContainer = $('#game');
